@@ -1,4 +1,4 @@
-# infrastructure# Azure Static Web App Deployment Scripts
+# Azure Static Web App Deployment Scripts
 
 This repository contains two Bash scripts that automate the deployment of Azure Static Web Apps with custom domain configuration. Choose the script that matches your DNS provider.
 
