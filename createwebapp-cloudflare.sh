@@ -263,35 +263,29 @@ add_cloudflare_dns_entries() {
     
     echo "TXT record added successfully."
     
-    # Now add CNAME or A record for the domain
+    # Now add CNAME record for the domain
     if [[ "$CUSTOM_DOMAIN" == "$DOMAIN_ROOT" ]]; then
-        # For apex domain, add A record
-        echo "Adding A record for apex domain..."
+        # For apex domain with Cloudflare, we can use CNAME with flattening
+        echo "Adding CNAME record for apex domain (using Cloudflare CNAME flattening)..."
         
-        # Get the IP addresses for the Azure Static Web App
-        IP_ADDRESSES=$(dig +short "$DEFAULT_HOSTNAME")
-        
-        # Take the first IP address (simplified approach)
-        IP_ADDRESS=$(echo "$IP_ADDRESSES" | head -n 1)
-        
-        A_RESPONSE=$(curl -s -X POST "$CLOUDFLARE_API_URL/zones/$CLOUDFLARE_ZONE_ID/dns_records" \
+        CNAME_RESPONSE=$(curl -s -X POST "$CLOUDFLARE_API_URL/zones/$CLOUDFLARE_ZONE_ID/dns_records" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             -H "Content-Type: application/json" \
             --data "{
-                \"type\": \"A\",
+                \"type\": \"CNAME\",
                 \"name\": \"@\",
-                \"content\": \"$IP_ADDRESS\",
+                \"content\": \"$DEFAULT_HOSTNAME\",
                 \"ttl\": 600,
                 \"proxied\": true
             }")
         
-        if [[ $(echo "$A_RESPONSE" | jq -r '.success') != "true" ]]; then
-            echo "Failed to add A record to Cloudflare DNS."
-            echo "Response: $A_RESPONSE"
+        if [[ $(echo "$CNAME_RESPONSE" | jq -r '.success') != "true" ]]; then
+            echo "Failed to add CNAME record to Cloudflare DNS."
+            echo "Response: $CNAME_RESPONSE"
             exit 1
         fi
         
-        echo "A record added successfully."
+        echo "CNAME record for apex domain added successfully."
     else
         # For subdomain, add CNAME record
         SUBDOMAIN="${CUSTOM_DOMAIN%%.$DOMAIN_ROOT}"

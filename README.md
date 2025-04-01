@@ -68,8 +68,9 @@ Both scripts handle the complete workflow:
 - If a Static Web App with the same name already exists, it will be deleted and recreated
 - The scripts will automatically extract the domain root from the custom domain (e.g., "example.com" from "www.example.com")
 - DNS records for domain validation will be created automatically
-- For apex domains (e.g., example.com), an A record will be added
-- For subdomains (e.g., www.example.com), a CNAME record will be added
+- For apex domains (e.g., example.com) with GoDaddy, an A record will be added
+- For apex domains with Cloudflare, a CNAME record will be added (utilizing Cloudflare's CNAME flattening)
+- For subdomains (e.g., www.example.com), a CNAME record will be added for both providers
 - The script waits for DNS validation before completing
 
 ## Getting API Credentials
